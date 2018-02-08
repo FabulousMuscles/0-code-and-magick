@@ -4,6 +4,6 @@ module.exports = {
   name: `version`,
   description: `Shows program version`,
   execute() {
-    console.log(`v${packageInfo.version}`)
+    console.log(`v${packageInfo.version}`);
   }
 };
