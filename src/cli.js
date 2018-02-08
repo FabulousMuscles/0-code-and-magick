@@ -2,9 +2,19 @@ const authorCommand = require(`./author`);
 const versionCommand = require(`./version`);
 const packageInfo = require(`../package.json`);
 
+const helpCommand = {
+  name: `help`,
+  description: `Prints this help`,
+  execute() {
+    console.log(`Available commands: 
+${[...name2command].map(([key, value]) => `--${key.padEnd(10)} — ${value.description}`).join(`\n`)}`);
+  }
+};
+
 const name2command = new Map();
 name2command.set(authorCommand.name, authorCommand);
 name2command.set(versionCommand.name, versionCommand);
+name2command.set(helpCommand.name, helpCommand);
 
 const args = process.argv.slice(2);
 
@@ -20,12 +30,6 @@ if (!firstCommand.startsWith(`--`)) {
 }
 
 const commandName = firstCommand.substring(2);
-if (commandName === `help`) {
-  console.log(`Available commands: 
-${[...name2command].map(([key, value]) => `--${key} — ${value.description}`).join(`\n`)}`);
-  process.exit(0);
-}
-
 const command = name2command.get(commandName);
 
 if (!command) {
