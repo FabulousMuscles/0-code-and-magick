@@ -2,12 +2,14 @@ const authorCommand = require(`./author`);
 const versionCommand = require(`./version`);
 const packageInfo = require(`../package.json`);
 
+require(`colors`);
+
 const helpCommand = {
   name: `help`,
   description: `Prints this help`,
   execute() {
     console.log(`Available commands: 
-${[...name2command].map(([key, value]) => `--${key.padEnd(10)} — ${value.description}`).join(`\n`)}`);
+${[...name2command].map(([key, value]) => `--${key.padEnd(10).italic.grey} — ${value.description.green}`).join(`\n`)}`);
   }
 };
 

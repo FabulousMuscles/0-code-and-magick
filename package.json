@@ -13,5 +13,8 @@
   "devDependencies": {
     "eslint": "4.17.0",
     "eslint-config-htmlacademy": "0.4.2"
+  },
+  "dependencies": {
+    "colors": "1.1.2"
   }
 }
