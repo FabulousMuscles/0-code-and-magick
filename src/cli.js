@@ -41,9 +41,7 @@ if (!command) {
   process.exit(1);
 }
 
-command.execute(void 0, (err) => {
-  if (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
+command.execute().catch((err) => {
+  console.error(err.message);
+  process.exit(1);
 });
