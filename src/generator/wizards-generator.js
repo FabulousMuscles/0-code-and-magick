@@ -49,8 +49,7 @@ const Fireballs = [{
 const getArtifacts = () => Boots
     .concat(Levitation)
     .concat(Fireballs)
-    .filter(() => Math.random() > 0.25)
-    .sort((a, b) => Math.random() > 0.25 ? a - b : b - a);
+    .filter(() => Math.random() > 0.25);
 
 
 const namesGenerator = function* (names) {
