@@ -1,5 +1,6 @@
 const authorCommand = require(`./author`);
 const versionCommand = require(`./version`);
+const generateCommand = require(`./generate`);
 const packageInfo = require(`../package.json`);
 
 require(`colors`);
@@ -17,6 +18,7 @@ const name2command = new Map();
 name2command.set(authorCommand.name, authorCommand);
 name2command.set(versionCommand.name, versionCommand);
 name2command.set(helpCommand.name, helpCommand);
+name2command.set(generateCommand.name, generateCommand);
 
 const args = process.argv.slice(2);
 
@@ -39,4 +41,9 @@ if (!command) {
   process.exit(1);
 }
 
-command.execute();
+command.execute((err) => {
+  if (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+});
