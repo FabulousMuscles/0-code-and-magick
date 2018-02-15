@@ -16,7 +16,7 @@ describe(`Generate JSON command`, function () {
   it(`should create new file`, function () {
     const tempFileName = `${__dirname}/testfile.json`;
     return generateCommand.execute(tempFileName)
-      .then(() => access(tempFileName))
-      .then(() => unlink(tempFileName));
+        .then(() => access(tempFileName))
+        .then(() => unlink(tempFileName));
   });
 });
