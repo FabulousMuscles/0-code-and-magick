@@ -1,7 +1,6 @@
 const authorCommand = require(`./cli/author`);
 const versionCommand = require(`./cli/version`);
 const generateCommand = require(`./cli/generate`);
-const packageInfo = require(`../package.json`);
 const server = require(`./server`);
 
 require(`colors`);
