@@ -1,6 +1,6 @@
-const authorCommand = require(`./author`);
-const versionCommand = require(`./version`);
-const generateCommand = require(`./generate`);
+const authorCommand = require(`./cli/author`);
+const versionCommand = require(`./cli/version`);
+const generateCommand = require(`./cli/generate`);
 const packageInfo = require(`../package.json`);
 
 require(`colors`);
@@ -41,7 +41,11 @@ if (!command) {
   process.exit(1);
 }
 
-command.execute().catch((err) => {
-  console.error(err.message);
-  process.exit(1);
-});
+const promise = command.execute();
+
+if (promise instanceof Promise) {
+  promise.catch((err) => {
+    console.error(err.message);
+    process.exit(1);
+  });
+}
