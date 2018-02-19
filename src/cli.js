@@ -1,7 +1,7 @@
-const authorCommand = require(`./author`);
-const versionCommand = require(`./version`);
-const generateCommand = require(`./generate`);
-const packageInfo = require(`../package.json`);
+const authorCommand = require(`./cli/author`);
+const versionCommand = require(`./cli/version`);
+const generateCommand = require(`./cli/generate`);
+const server = require(`./server`);
 
 require(`colors`);
 
@@ -23,25 +23,28 @@ name2command.set(generateCommand.name, generateCommand);
 const args = process.argv.slice(2);
 
 if (args.length === 0) {
-  console.log(packageInfo.description);
-  process.exit(0);
+  server.run();
+} else {
+  const firstCommand = args[0];
+  if (!firstCommand.startsWith(`--`)) {
+    console.error(`Unknown command: "${firstCommand}`);
+    process.exit(1);
+  }
+
+  const commandName = firstCommand.substring(2);
+  const command = name2command.get(commandName);
+
+  if (!command) {
+    console.error(`Unknown command: "${firstCommand}`);
+    process.exit(1);
+  }
+
+  const promise = command.execute();
+
+  if (promise instanceof Promise) {
+    promise.catch((err) => {
+      console.error(err.message);
+      process.exit(1);
+    });
+  }
 }
-
-const firstCommand = args[0];
-if (!firstCommand.startsWith(`--`)) {
-  console.error(`Unknown command: "${firstCommand}`);
-  process.exit(1);
-}
-
-const commandName = firstCommand.substring(2);
-const command = name2command.get(commandName);
-
-if (!command) {
-  console.error(`Unknown command: "${firstCommand}`);
-  process.exit(1);
-}
-
-command.execute().catch((err) => {
-  console.error(err.message);
-  process.exit(1);
-});

@@ -1,4 +1,4 @@
-const {generate} = require(`./generator/wizards-generator`);
+const {generate} = require(`../generator/wizards-generator`);
 const fs = require(`fs`);
 const util = require(`util`);
 const writeFile = util.promisify(fs.writeFile);
