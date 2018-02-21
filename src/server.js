@@ -2,10 +2,21 @@ const http = require(`http`);
 const url = require(`url`);
 const fs = require(`fs`);
 const {promisify} = require(`util`);
+const path = require(`path`);
 
 const stat = promisify(fs.stat);
 const readdir = promisify(fs.readdir);
 const readfile = promisify(fs.readFile);
+
+const EXTENSION_MAP = {
+  '.css': `text/css`,
+  '.html': `text/html`,
+  '.jpg': `image/jpeg`,
+  '.jpeg': `image/jpeg`,
+  '.png': `image/png`,
+  '.gif': `image/gif`,
+  '.ico': `image/x-icon`,
+};
 
 const HOSTNAME = `127.0.0.1`;
 const PORT = 3000;
@@ -25,9 +36,10 @@ const printDirectory = (path, files) => {
 </html>`;
 };
 
-const readFile = async (path, res) => {
-  const data = await readfile(path);
-  res.setHeader(`content-type`, `text/plain`);
+const readFile = async (filepath, res) => {
+  const data = await readfile(filepath);
+  const extension = path.extname(filepath);
+  res.setHeader(`content-type`, EXTENSION_MAP[extension] || `text/plain`);
   res.setHeader(`content-length`, Buffer.byteLength(data));
   res.end(data);
 };
@@ -41,8 +53,10 @@ const readDir = async (path, res) => {
   res.end(content);
 };
 
+const staticFolder = `${process.cwd()}/static`;
+
 const server = http.createServer((req, res) => {
-  const absolutePath = __dirname + url.parse(req.url).pathname;
+  const absolutePath = staticFolder + url.parse(req.url).pathname;
 
   (async () => {
     try {
