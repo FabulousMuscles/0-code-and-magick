@@ -60,7 +60,7 @@ const namesGenerator = function* (names) {
 };
 
 
-const names = namesGenerator([
+const createNamesIterator = () => namesGenerator([
   `Григорий Распутин`,
   `Гендальф Белый`,
   `Гендальф Серый`,
@@ -83,7 +83,7 @@ const names = namesGenerator([
 
 const getRandomFromArr = (arr) => arr[Math.floor(arr.length * Math.random())];
 
-const generate = () => [...names].map((name) => ({
+const generate = () => [...createNamesIterator()].map((name) => ({
   'name': name,
   'colorCoat': getRandomFromArr(Color.COAT),
   'colorEyes': getRandomFromArr(Color.EYES),
