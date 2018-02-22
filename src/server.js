@@ -23,7 +23,7 @@ app.get(`/api/wizards/:name`, (req, res) => {
   }
 });
 
-app.post(`/api/wizards`, upload.none(), (req, res) => {
+app.post(`/api/wizards`, upload.single(`avatar`), (req, res) => {
   res.send(req.body);
 });
 
