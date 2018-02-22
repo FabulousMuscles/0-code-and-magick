@@ -1,51 +1,65 @@
 const request = require(`supertest`);
-const {app} = require(`../src/server`);
+const {app} = require(`../src/server/server`);
 
 describe(`POST /api/wizards`, function () {
 
   it(`should consume JSON`, () => {
     return request(app).post(`/api/wizards`).
         send({
-          name: `Гендальф Серый`,
-          colorCoat: `rgb(56, 159, 117)`,
-          colorEyes: `red`,
-          colorFireball: `#5ce6c0`,
+          username: `Гендальф Серый`,
+          coatColor: `rgb(56, 159, 117)`,
+          eyeColor: `red`,
+          fireballColor: `#5ce6c0`,
         }).
         expect(200, {
-          name: `Гендальф Серый`,
-          colorCoat: `rgb(56, 159, 117)`,
-          colorEyes: `red`,
-          colorFireball: `#5ce6c0`,
+          username: `Гендальф Серый`,
+          coatColor: `rgb(56, 159, 117)`,
+          eyeColor: `red`,
+          fireballColor: `#5ce6c0`,
         });
   });
 
   it(`should consume form-data`, () => {
     return request(app).post(`/api/wizards`).
-        field(`name`, `Гендальф Серый`).
-        field(`colorCoat`, `rgb(56, 159, 117)`).
-        field(`colorEyes`, `red`).
-        field(`colorFireball`, `#5ce6c0`).
+        field(`username`, `Гендальф Серый`).
+        field(`coatColor`, `rgb(56, 159, 117)`).
+        field(`eyeColor`, `red`).
+        field(`fireballColor`, `#5ce6c0`).
         expect(200, {
-          name: `Гендальф Серый`,
-          colorCoat: `rgb(56, 159, 117)`,
-          colorEyes: `red`,
-          colorFireball: `#5ce6c0`,
+          username: `Гендальф Серый`,
+          coatColor: `rgb(56, 159, 117)`,
+          eyeColor: `red`,
+          fireballColor: `#5ce6c0`,
         });
   });
 
   it(`should consume form-data with avatar`, () => {
     return request(app).post(`/api/wizards`).
-        field(`name`, `Гендальф Серый`).
-        field(`colorCoat`, `rgb(56, 159, 117)`).
-        field(`colorEyes`, `red`).
-        field(`colorFireball`, `#5ce6c0`).
+        field(`username`, `Гендальф Серый`).
+        field(`coatColor`, `rgb(56, 159, 117)`).
+        field(`eyeColor`, `red`).
+        field(`fireballColor`, `#5ce6c0`).
         attach(`avatar`, `test/fixtures/keks.png`).
         expect(200, {
-          name: `Гендальф Серый`,
-          colorCoat: `rgb(56, 159, 117)`,
-          colorEyes: `red`,
-          colorFireball: `#5ce6c0`,
+          username: `Гендальф Серый`,
+          coatColor: `rgb(56, 159, 117)`,
+          eyeColor: `red`,
+          fireballColor: `#5ce6c0`,
         });
+  });
+
+  it(`should fail if username is invalid`, () => {
+    return request(app).post(`/api/wizards`).
+        field(`username`, `Г`).
+        field(`coatColor`, `rgb(56, 159, 117)`).
+        field(`eyeColor`, `red`).
+        field(`fireballColor`, `#5ce6c0`).
+        attach(`avatar`, `test/fixtures/keks.png`).
+        expect(400, [{
+          fieldName: `username`,
+          fieldValue: `Г`,
+          errorMessage: `should be in range 2..25`
+        }]);
   });
 
 
