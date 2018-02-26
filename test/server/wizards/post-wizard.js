@@ -1,5 +1,8 @@
 const request = require(`supertest`);
-const {app} = require(`../../../src/server/server`);
+const router = require(`../../../src/server/wizards/route`);
+const app = require(`express`)();
+
+app.use(`/api/wizards`, router);
 
 describe(`POST /api/wizards`, function () {
 

@@ -13,8 +13,7 @@ wizardsRouter.use(bodyParser.json());
 
 const upload = multer({storage: multer.memoryStorage()});
 
-const wizards = generateWizards();
-
+wizardsRouter.data = generateWizards();
 
 const toPage = (data, skip = 0, limit = 20) => {
   return {
@@ -25,12 +24,12 @@ const toPage = (data, skip = 0, limit = 20) => {
   };
 };
 
-wizardsRouter.get(``, async(async (req, res) => res.send(toPage(wizards))));
+wizardsRouter.get(``, async(async (req, res) => res.send(toPage(wizardsRouter.data))));
 
 
 wizardsRouter.get(`/:name`, (req, res) => {
   const name = req.params[`name`].toLowerCase();
-  const wizard = wizards.find((it) => it.name.toLowerCase() === name);
+  const wizard = wizardsRouter.data.find((it) => it.name.toLowerCase() === name);
   if (!wizard) {
     res.status(404).end();
   } else {
