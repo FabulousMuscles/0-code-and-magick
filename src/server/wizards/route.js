@@ -4,9 +4,7 @@ const codeAndMagicSchema = require(`./validation`);
 const dataRenderer = require(`../util/data-renderer`);
 const ValidationError = require(`../error/validation-error`);
 const NotFoundError = require(`../error/not-found-error`);
-const wizardStore = require(`./store`);
 const async = require(`../util/async`);
-const imageStore = require(`../images/store`);
 const bodyParser = require(`body-parser`);
 const multer = require(`multer`);
 const createStreamFromBuffer = require(`../util/buffer-to-stream`);
@@ -26,9 +24,7 @@ const toPage = async (cursor, skip = 0, limit = 20) => {
   };
 };
 
-wizardsRouter.store = wizardStore;
-
-wizardsRouter.get(``, async(async (req, res) => res.send(await toPage(await wizardsRouter.store.getAllWizards()))));
+wizardsRouter.get(``, async(async (req, res) => res.send(await toPage(await wizardsRouter.wizardsStore.getAllWizards()))));
 
 wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   const data = req.body;
@@ -45,17 +41,17 @@ wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   }
 
   if (avatar) {
-    await imageStore.save(avatar.filename, createStreamFromBuffer(avatar.buffer));
+    await wizardsRouter.imageStore.save(avatar.filename, createStreamFromBuffer(avatar.buffer));
     data.avatar = avatar.filename;
   }
-  await wizardsRouter.store.save(data);
+  await wizardsRouter.wizardsStore.save(data);
   dataRenderer.renderDataSuccess(req, res, data);
 }));
 
 wizardsRouter.get(`/:name`, async(async (req, res) => {
   const wizardName = req.params.name;
 
-  const found = await wizardsRouter.store.getWizard(wizardName);
+  const found = await wizardsRouter.wizardsStore.getWizard(wizardName);
   if (!found) {
     throw new NotFoundError(`Wizard with name "${wizardName}" not found`);
   }
@@ -65,13 +61,13 @@ wizardsRouter.get(`/:name`, async(async (req, res) => {
 wizardsRouter.get(`/:name/avatar`, async(async (req, res) => {
   const wizardName = req.params.name;
 
-  const {avatar} = await wizardsRouter.store.getWizard(wizardName);
+  const {avatar} = await wizardsRouter.wizardsStore.getWizard(wizardName);
 
   if (!(avatar)) {
     throw new NotFoundError(`Wizard with name "${wizardName}" not found`);
   }
 
-  const {info, stream} = await imageStore.get(avatar.filename);
+  const {info, stream} = await wizardsRouter.imageStore.get(avatar.filename);
 
   if (!info) {
     throw new NotFoundError(`File was not found`);
@@ -89,4 +85,8 @@ wizardsRouter.use((exception, req, res, next) => {
 });
 
 
-module.exports = wizardsRouter;
+module.exports = (wizardStore, imageStore) => {
+  wizardsRouter.wizardsStore = wizardStore;
+  wizardsRouter.imageStore = imageStore;
+  return wizardsRouter;
+};

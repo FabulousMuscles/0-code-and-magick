@@ -1,5 +1,7 @@
 const express = require(`express`);
-const wizardsRouter = require(`./wizards/route`);
+const wizardStore = require(`./wizards/store`);
+const imageStore = require(`./images/store`);
+const wizardsRouter = require(`./wizards/route`)(wizardStore, imageStore);
 
 const app = express();
 app.use(express.static(`static`));
