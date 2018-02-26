@@ -1,6 +1,9 @@
 const request = require(`supertest`);
 const assert = require(`assert`);
-const {app} = require(`../../../src/server/server`);
+const mockWizardsRouter = require(`./mock-wizards-router`);
+const app = require(`express`)();
+
+app.use(`/api/wizards`, mockWizardsRouter);
 
 describe(`GET /api/wizards`, function () {
 
