@@ -41,9 +41,14 @@ wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   }
 
   if (avatar) {
-    await wizardsRouter.imageStore.save(avatar.filename, createStreamFromBuffer(avatar.buffer));
-    data.avatar = avatar.filename;
+    const avatarInfo = {
+      path: `/api/wizards/${data.username}/avatar`,
+      mimetype: avatar.mimetype
+    };
+    await wizardsRouter.imageStore.save(avatarInfo.path, createStreamFromBuffer(avatar.buffer));
+    data.avatar = avatarInfo;
   }
+
   await wizardsRouter.wizardsStore.save(data);
   dataRenderer.renderDataSuccess(req, res, data);
 }));
@@ -61,13 +66,19 @@ wizardsRouter.get(`/:name`, async(async (req, res) => {
 wizardsRouter.get(`/:name/avatar`, async(async (req, res) => {
   const wizardName = req.params.name;
 
-  const {avatar} = await wizardsRouter.wizardsStore.getWizard(wizardName);
+  const wizard = await wizardsRouter.wizardsStore.getWizard(wizardName);
 
-  if (!(avatar)) {
+  if (!wizard) {
     throw new NotFoundError(`Wizard with name "${wizardName}" not found`);
   }
 
-  const {info, stream} = await wizardsRouter.imageStore.get(avatar.filename);
+  const avatar = wizard.avatar;
+
+  if (!avatar) {
+    throw new NotFoundError(`Wizard with name "${wizardName}" didn't upload avatar`);
+  }
+
+  const {info, stream} = await wizardsRouter.imageStore.get(avatar.path);
 
   if (!info) {
     throw new NotFoundError(`File was not found`);
