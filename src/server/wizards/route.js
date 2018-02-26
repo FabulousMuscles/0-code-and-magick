@@ -1,11 +1,15 @@
 const {Router} = require(`express`);
 const {validateSchema} = require(`../util/validator`);
 const codeAndMagicSchema = require(`./validation`);
+const dataRenderer = require(`../util/data-renderer`);
 const ValidationError = require(`../error/validation-error`);
+const NotFoundError = require(`../error/not-found-error`);
+const wizardStore = require(`./store`);
 const async = require(`../util/async`);
+const imageStore = require(`../images/store`);
 const bodyParser = require(`body-parser`);
 const multer = require(`multer`);
-const {generate: generateWizards} = require(`../../generator/wizards-generator`);
+const createStreamFromBuffer = require(`../util/buffer-to-stream`);
 
 const wizardsRouter = new Router();
 
@@ -13,47 +17,74 @@ wizardsRouter.use(bodyParser.json());
 
 const upload = multer({storage: multer.memoryStorage()});
 
-wizardsRouter.data = generateWizards();
-
-const toPage = (data, skip = 0, limit = 20) => {
+const toPage = async (cursor, skip = 0, limit = 20) => {
   return {
-    data: data.slice(skip, skip + limit),
+    data: await (cursor.skip(skip).limit(limit).toArray()),
     skip,
     limit,
-    total: data.length
+    total: await cursor.count()
   };
 };
 
-wizardsRouter.get(``, async(async (req, res) => res.send(toPage(wizardsRouter.data))));
+wizardsRouter.store = wizardStore;
 
+wizardsRouter.get(``, async(async (req, res) => res.send(await toPage(await wizardsRouter.store.getAllWizards()))));
 
-wizardsRouter.get(`/:name`, (req, res) => {
-  const name = req.params[`name`].toLowerCase();
-  const wizard = wizardsRouter.data.find((it) => it.name.toLowerCase() === name);
-  if (!wizard) {
-    res.status(404).end();
-  } else {
-    res.send(wizard);
-  }
-});
-
-wizardsRouter.post(``, upload.single(`avatar`), (req, res) => {
+wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   const data = req.body;
+
+  const avatar = req.file;
+  if (avatar) {
+    data.avatar = avatar;
+  }
+  console.log(data);
   const errors = validateSchema(data, codeAndMagicSchema);
 
   if (errors.length > 0) {
     throw new ValidationError(errors);
   }
 
-  res.send(data);
-});
+  if (avatar) {
+    await imageStore.save(avatar.filename, createStreamFromBuffer(avatar.buffer));
+    data.avatar = avatar.filename;
+  }
+  await wizardsRouter.store.save(data);
+  dataRenderer.renderDataSuccess(req, res, data);
+}));
+
+wizardsRouter.get(`/:name`, async(async (req, res) => {
+  const wizardName = req.params.name;
+
+  const found = await wizardsRouter.store.getWizard(wizardName);
+  if (!found) {
+    throw new NotFoundError(`Wizard with name "${wizardName}" not found`);
+  }
+  res.send(found);
+}));
+
+wizardsRouter.get(`/:name/avatar`, async(async (req, res) => {
+  const wizardName = req.params.name;
+
+  const {avatar} = await wizardsRouter.store.getWizard(wizardName);
+
+  if (!(avatar)) {
+    throw new NotFoundError(`Wizard with name "${wizardName}" not found`);
+  }
+
+  const {info, stream} = await imageStore.get(avatar.filename);
+
+  if (!info) {
+    throw new NotFoundError(`File was not found`);
+  }
+
+  res.set(`content-type`, avatar.mimetype);
+  res.set(`content-length`, info.length);
+  res.status(200);
+  stream.pipe(res);
+}));
 
 wizardsRouter.use((exception, req, res, next) => {
-  let data = exception;
-  if (exception instanceof ValidationError) {
-    data = exception.errors;
-  }
-  res.status(400).send(data);
+  dataRenderer.renderException(req, res, exception);
   next();
 });
 
