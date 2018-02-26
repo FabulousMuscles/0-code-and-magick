@@ -48,6 +48,10 @@ describe(`POST /api/wizards`, function () {
           coatColor: `rgb(56, 159, 117)`,
           eyeColor: `red`,
           fireballColor: `#5ce6c0`,
+          avatar: {
+            path: `/api/wizards/Гендальф Серый/avatar`,
+            mimetype: `image/png`
+          }
         });
   });
 
