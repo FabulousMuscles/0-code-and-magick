@@ -8,6 +8,7 @@ const async = require(`../util/async`);
 const bodyParser = require(`body-parser`);
 const multer = require(`multer`);
 const createStreamFromBuffer = require(`../util/buffer-to-stream`);
+const logger = require(`../../logger`);
 
 const wizardsRouter = new Router();
 
@@ -39,7 +40,7 @@ wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   if (avatar) {
     data.avatar = avatar;
   }
-  console.log(data);
+  logger.info(data);
   const errors = validateSchema(data, codeAndMagicSchema);
 
   if (errors.length > 0) {
