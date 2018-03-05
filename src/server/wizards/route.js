@@ -13,6 +13,12 @@ const wizardsRouter = new Router();
 
 wizardsRouter.use(bodyParser.json());
 
+wizardsRouter.use((req, res, next) => {
+  res.header(`Access-Control-Allow-Origin`, `*`);
+  res.header(`Access-Control-Allow-Headers`, `Origin, X-Requested-With, Content-Type, Accept`);
+  next();
+});
+
 const upload = multer({storage: multer.memoryStorage()});
 
 const toPage = async (cursor, skip = 0, limit = 20) => {
