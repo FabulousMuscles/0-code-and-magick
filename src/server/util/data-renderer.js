@@ -1,4 +1,5 @@
 const util = require(`util`);
+const {MongoError} = require(`mongodb`);
 const ValidationError = require(`../error/validation-error`);
 
 const SUCCESS_CODE = 200;
@@ -63,6 +64,17 @@ module.exports = {
     let data = exception;
     if (exception instanceof ValidationError) {
       data = exception.errors;
+    } else if (exception instanceof MongoError) {
+      data = {};
+      switch (exception.code) {
+        case 11000:
+          data.code = 400;
+          data.errorMessage = `Дубликат существущего персонажа`;
+          break;
+        default:
+          data.code = 501;
+          data.errorMessage = exception.message;
+      }
     }
     render(req, res, data, false);
   }
