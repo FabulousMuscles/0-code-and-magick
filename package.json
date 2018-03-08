@@ -6,7 +6,9 @@
   "scripts": {
     "test:lint": "eslint .",
     "test:mocha": "mocha --recursive",
-    "test": "npm run test:lint && npm run test:mocha"
+    "test": "npm run test:lint && npm run test:mocha",
+    "start": "node index.js",
+    "deploy": "pm2 start index.js -i 2 --name 'code-and-magick'"
   },
   "keywords": [],
   "author": "",
