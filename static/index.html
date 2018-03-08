@@ -115,13 +115,13 @@
             </g>
           </svg>
         </div>
-        <input type="hidden" name="coat-color" value="rgb(101, 137, 164)">
-        <input type="hidden" name="eyes-color" value="black">
+        <input class="setup-wizard-coat" type="hidden" name="coatColor" value="rgb(101, 137, 164)">
+        <input class="setup-wizard-eye" type="hidden" name="eyeColor" value="black">
       </div>
 
       <div class="setup-fireball-wrap">
         <div class="setup-fireball"></div>
-        <input type="hidden" name="fireball-color" value="#ee4830">
+        <input class="setup-wizard-fireball" type="hidden" name="fireballColor" value="#ee4830">
       </div>
 
       <div class="setup-artifacts" dropzone="move">
@@ -180,6 +180,13 @@
     <p class="setup-similar-label">Петр Петров</p>
   </div>
 </template>
+
+<script>
+  window.SERVER_URL_GET = 'http://127.0.0.1:3000/api/wizards';
+  window.SERVER_URL_POST = 'http://127.0.0.1:3000/api/wizards';
+</script>
+
+<script src="script.min.js" type="application/javascript"></script>
 
 </body>
 </html>

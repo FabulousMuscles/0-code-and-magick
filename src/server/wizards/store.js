@@ -1,4 +1,5 @@
 const db = require(`../../database/database`);
+const logger = require(`../../logger`);
 
 const setupCollection = async () => {
   const dBase = await db;
@@ -27,4 +28,4 @@ class WizardStore {
 
 }
 
-module.exports = new WizardStore(setupCollection().catch((e) => console.error(`Failed to set up "wizards"-collection`, e)));
+module.exports = new WizardStore(setupCollection().catch((e) => logger.error(`Failed to set up "wizards"-collection`, e)));

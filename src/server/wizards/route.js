@@ -8,10 +8,17 @@ const async = require(`../util/async`);
 const bodyParser = require(`body-parser`);
 const multer = require(`multer`);
 const createStreamFromBuffer = require(`../util/buffer-to-stream`);
+const logger = require(`../../logger`);
 
 const wizardsRouter = new Router();
 
 wizardsRouter.use(bodyParser.json());
+
+wizardsRouter.use((req, res, next) => {
+  res.header(`Access-Control-Allow-Origin`, `*`);
+  res.header(`Access-Control-Allow-Headers`, `Origin, X-Requested-With, Content-Type, Accept`);
+  next();
+});
 
 const upload = multer({storage: multer.memoryStorage()});
 
@@ -33,7 +40,7 @@ wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   if (avatar) {
     data.avatar = avatar;
   }
-  console.log(data);
+  logger.info(`Received data from user: `, data);
   const errors = validateSchema(data, codeAndMagicSchema);
 
   if (errors.length > 0) {
