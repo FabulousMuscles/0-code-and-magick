@@ -40,7 +40,7 @@ wizardsRouter.post(``, upload.single(`avatar`), async(async (req, res) => {
   if (avatar) {
     data.avatar = avatar;
   }
-  logger.info(data);
+  logger.info(`Received data from user: `, data);
   const errors = validateSchema(data, codeAndMagicSchema);
 
   if (errors.length > 0) {
